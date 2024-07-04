@@ -12,14 +12,14 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/jackc/pgx/v4/pgxpool"
 
-	"hse_school/internal/handlers"
+	"memoryflips/handlers"
 	// "hse_school/internal/repositories"
 	// "hse_school/internal/services"
 )
 
 func main() {
 	// Подключение к базе данных
-	db, err := pgxpool.Connect(context.Background(), "postgresql://postgres:password@127.0.0.1/postgres")
+	db, err := pgxpool.Connect(context.Background(), "postgresql://postgres:password@127.0.0.1/memoryflip")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -34,10 +34,12 @@ func main() {
 	r := chi.NewRouter()
 
 	workDir, _ := os.Getwd()
-	filesDir := http.Dir(filepath.Join(workDir, "cmd/project/data"))
+	filesDir := http.Dir(filepath.Join(workDir, "data"))
 	FileServer(r, "/files", filesDir)
 
 	r.Get("/", handlers.Index)
+	r.Get("/feed", handlers.List)
+	r.Get("/list", handlers.List)
 	r.Get("/favicon.ico", handlers.Favicon)
 	// r.Get("/users/{id}", handler.GetUserByID)
 	// r.Post("/users", handler.CreateUser)

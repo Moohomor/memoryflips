@@ -1,4 +1,4 @@
-module hse_school
+module memoryflips
 
 go 1.22
 
