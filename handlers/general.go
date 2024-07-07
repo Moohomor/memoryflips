@@ -9,7 +9,10 @@ import (
 
 func Index(w http.ResponseWriter, r *http.Request) {
 	tpl := template.Must(template.ParseFiles("home.html"))
-	tpl.Execute(w, nil)
+	err := tpl.Execute(w, nil)
+	if err != nil {
+		return
+	}
 }
 
 func Favicon(w http.ResponseWriter, r *http.Request) {
@@ -18,5 +21,8 @@ func Favicon(w http.ResponseWriter, r *http.Request) {
 
 func List(w http.ResponseWriter, r *http.Request) {
 	tpl := template.Must(template.ParseFiles("feed.html"))
-	tpl.Execute(w, nil)
+	err := tpl.Execute(w, nil)
+	if err != nil {
+		return
+	}
 }

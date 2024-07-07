@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"fmt"
 	"html/template"
 	"memoryflips/db"
@@ -19,8 +20,8 @@ var sessions = map[string]session{}
 
 // each session contains the username of the user and the time at which it expires
 type session struct {
-	user_id int
-	expiry  time.Time
+	userId int
+	expiry time.Time
 }
 
 // we'll use this method later to determine if the session has expired
@@ -43,27 +44,23 @@ func NewAuthHandler(svc *db.Service) *AuthHandler {
 
 func (h *AuthHandler) LoginPost(w http.ResponseWriter, r *http.Request) {
 	fmt.Print("Username and password: ")
-	r.ParseForm()
+	err := r.ParseForm()
 	username := r.Form.Get("username")
 	password := r.Form.Get("password")
 	fmt.Println(username, password)
-	h.svc.GetUserByName(username)
-	var creds Credentials = Credentials{
-		UserId:   1,
+	user, err := h.svc.GetUserByName(context.Background(), username)
+	if err != nil {
+		panic(err)
+	}
+	var creds = Credentials{
+		UserId:   user.Id,
 		Password: password,
 	}
 	// Get the JSON body and decode into credentials
 
 	// Get the expected password from our in memory map
-	expectedPassword, ok := users[creds.UserId]
+	expectedPassword := user.Password
 
-	// If a password exists for the given user
-	// AND, if it is the same as the password we received, the we can move ahead
-	// if NOT, then we return an "Unauthorized" status
-	if !ok {
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
 	if expectedPassword != creds.Password {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
@@ -76,8 +73,8 @@ func (h *AuthHandler) LoginPost(w http.ResponseWriter, r *http.Request) {
 
 	// Set the token in the session map, along with the session information
 	sessions[sessionToken] = session{
-		user_id: creds.UserId,
-		expiry:  expiresAt,
+		userId: creds.UserId,
+		expiry: expiresAt,
 	}
 
 	// Finally, we set the client cookie for "session_token" as the session token we just generated
@@ -87,6 +84,7 @@ func (h *AuthHandler) LoginPost(w http.ResponseWriter, r *http.Request) {
 		Value:   sessionToken,
 		Expires: expiresAt,
 	})
+	http.Redirect(w, r, "", http.StatusFound)
 	fmt.Println("Login successful")
 }
 
@@ -98,7 +96,10 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	data := dt{
 		message: "",
 	}
-	tpl.Execute(w, data)
+	err := tpl.Execute(w, data)
+	if err != nil {
+		return
+	}
 }
 
 func MyProfile(w http.ResponseWriter, r *http.Request) {
@@ -132,5 +133,8 @@ func MyProfile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// If the session is valid, return the welcome message to the user
-	w.Write([]byte(fmt.Sprintf("Welcome %i!", userSession.user_id)))
+	_, err = w.Write([]byte(fmt.Sprintf("Welcome %i!", userSession.userId)))
+	if err != nil {
+		return
+	}
 }

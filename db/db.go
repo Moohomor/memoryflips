@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
@@ -20,9 +19,13 @@ type Service struct {
 	db *pgxpool.Pool
 }
 
+func NewService(db *pgxpool.Pool) *Service {
+	return &Service{db: db}
+}
+
 func (s *Service) GetUserByName(ctx context.Context, name string) (*User, error) {
 	user := &User{}
-	err := s.db.QueryRow(ctx, "SELECT id, username, password FROM users WHERE username = $1", name).
+	err := s.db.QueryRow(ctx, "SELECT id, username, password FROM users WHERE username = $1;", name).
 		Scan(&user.Id, &user.Name, &user.Password)
 	if err != nil {
 		return nil, err

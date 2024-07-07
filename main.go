@@ -13,9 +13,8 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/jackc/pgx/v4/pgxpool"
 
+	dbsvc "memoryflips/db"
 	"memoryflips/handlers"
-	// "hse_school/internal/repositories"
-	// "hse_school/internal/services"
 )
 
 func main() {
@@ -38,12 +37,14 @@ func main() {
 	filesDir := http.Dir(filepath.Join(workDir, "data"))
 	FileServer(r, "/files", filesDir)
 
+	authHandlers := handlers.NewAuthHandler(dbsvc.NewService(db))
+
 	r.Get("/", handlers.Index)
 	r.Get("/feed", handlers.List)
 	r.Get("/list", handlers.List)
 	r.Get("/favicon.ico", handlers.Favicon)
 	r.Get("/login", handlers.Login)
-	r.Post("/login", handlers.LoginPost)
+	r.Post("/login", authHandlers.LoginPost)
 	r.Get("/me", handlers.MyProfile)
 	// r.Get("/signup", handlers.Signup)
 
