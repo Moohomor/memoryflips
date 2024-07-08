@@ -11,16 +11,11 @@ import (
 	"github.com/google/uuid"
 )
 
-var users = map[int]string{
-	1: "password1",
-	2: "password2",
-}
-
 var sessions = map[string]session{}
 
 // each session contains the username of the user and the time at which it expires
 type session struct {
-	userId int
+	user   db.User
 	expiry time.Time
 }
 
@@ -43,14 +38,19 @@ func NewAuthHandler(svc *db.Service) *AuthHandler {
 }
 
 func (h *AuthHandler) LoginPost(w http.ResponseWriter, r *http.Request) {
-	fmt.Print("Username and password: ")
+	fmt.Print("[Login] Username and password: ")
 	err := r.ParseForm()
+	if err != nil {
+		panic(err)
+		return
+	}
 	username := r.Form.Get("username")
 	password := r.Form.Get("password")
 	fmt.Println(username, password)
 	user, err := h.svc.GetUserByName(context.Background(), username)
 	if err != nil {
 		panic(err)
+		return
 	}
 	var creds = Credentials{
 		UserId:   user.Id,
@@ -73,7 +73,7 @@ func (h *AuthHandler) LoginPost(w http.ResponseWriter, r *http.Request) {
 
 	// Set the token in the session map, along with the session information
 	sessions[sessionToken] = session{
-		userId: creds.UserId,
+		user:   *user,
 		expiry: expiresAt,
 	}
 
@@ -84,8 +84,50 @@ func (h *AuthHandler) LoginPost(w http.ResponseWriter, r *http.Request) {
 		Value:   sessionToken,
 		Expires: expiresAt,
 	})
-	http.Redirect(w, r, "", http.StatusFound)
+	http.Redirect(w, r, "/", http.StatusFound)
 	fmt.Println("Login successful")
+}
+
+func (h *AuthHandler) SignupPost(w http.ResponseWriter, r *http.Request) {
+	fmt.Print("[Signup] Username and password: ")
+	err := r.ParseForm()
+	if err != nil {
+		panic(err)
+		return
+	}
+	username := r.Form.Get("username")
+	password := r.Form.Get("password")
+	fmt.Println(username, password)
+	var user = db.User{
+		Name:     username,
+		Password: password,
+	}
+	err = h.svc.CreateUser(context.Background(), user)
+	if err != nil {
+		panic(err)
+		return
+	}
+
+	// Create a new random session token
+	// we use the "github.com/google/uuid" library to generate UUIDs
+	sessionToken := uuid.NewString()
+	expiresAt := time.Now().Add(120 * time.Second)
+
+	// Set the token in the session map, along with the session information
+	sessions[sessionToken] = session{
+		user:   user,
+		expiry: expiresAt,
+	}
+
+	// Finally, we set the client cookie for "session_token" as the session token we just generated
+	// we also set an expiry time of 120 seconds
+	http.SetCookie(w, &http.Cookie{
+		Name:    "session_token",
+		Value:   sessionToken,
+		Expires: expiresAt,
+	})
+	http.Redirect(w, r, "/", http.StatusFound)
+	fmt.Println("Signup successful")
 }
 
 func Login(w http.ResponseWriter, r *http.Request) {
@@ -102,39 +144,65 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func Signup(w http.ResponseWriter, r *http.Request) {
+	tpl := template.Must(template.ParseFiles("signup.html"))
+	type dt struct {
+		message string
+	}
+	data := dt{
+		message: "",
+	}
+	err := tpl.Execute(w, data)
+	if err != nil {
+		return
+	}
+}
+
+func Logout(w http.ResponseWriter, r *http.Request) {
+	c, err := r.Cookie("session_token")
+	if err != nil {
+		panic(err)
+		return
+	}
+	delete(sessions, c.Value)
+	http.SetCookie(w, &http.Cookie{
+		Name:    "session_token",
+		Value:   "",
+		Expires: time.Now(),
+	})
+	http.Redirect(w, r, "/", http.StatusFound)
+}
+
 func MyProfile(w http.ResponseWriter, r *http.Request) {
+	// If the session is valid, return the welcome message to the user
+	user, err := GetCurrentUser(w, r)
+	if err == http.ErrNoCookie {
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte("<h1>401 Unauthorized</h1>\nThere's no cookie"))
+	} else if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("<h1>400 Bad Request</h1>\nThat's all we know"))
+		return
+	}
+	w.Write([]byte("Welcome " + user.Name))
+}
+
+func GetCurrentUser(w http.ResponseWriter, r *http.Request) (*db.User, error) {
 	// We can obtain the session token from the requests cookies, which come with every request
 	c, err := r.Cookie("session_token")
 	if err != nil {
-		if err == http.ErrNoCookie {
-			// If the cookie is not set, return an unauthorized status
-			w.WriteHeader(http.StatusUnauthorized)
-			return
-		}
-		// For any other type of error, return a bad request status
-		w.WriteHeader(http.StatusBadRequest)
-		return
+		return nil, err
 	}
 	sessionToken := c.Value
 
 	// We then get the session from our session map
 	userSession, exists := sessions[sessionToken]
 	if !exists {
-		// If the session token is not present in session map, return an unauthorized error
-		w.WriteHeader(http.StatusUnauthorized)
-		return
+		return nil, err
 	}
-	// If the session is present, but has expired, we can delete the session, and return
-	// an unauthorized status
 	if userSession.isExpired() {
 		delete(sessions, sessionToken)
-		w.WriteHeader(http.StatusUnauthorized)
-		return
+		return nil, err
 	}
-
-	// If the session is valid, return the welcome message to the user
-	_, err = w.Write([]byte(fmt.Sprintf("Welcome %i!", userSession.userId)))
-	if err != nil {
-		return
-	}
+	return &userSession.user, nil
 }

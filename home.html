@@ -2,7 +2,15 @@
     <title>MemoryFlips</title>
 </head>
 <body>
-    <h1>home.html</h1>
+    <h1>Home page</h1>
+    <header>
+        {{if .current_user}}
+        <a href="/me">{{.current_user}}</a>
+        <a href="/logout">LOGOUT</a>
+        {{else}}
+        <a href="/login">LOGIN</a>
+        <a href="/signup">SIGNUP</a>
+        {{end}}
+    </header>
     <a href="/feed">START</a>
-    <a href="/login">LOGIN</a>
 </body>

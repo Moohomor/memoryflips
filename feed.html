@@ -2,9 +2,18 @@
     <title>Feed</title>
 </head>
 <body>
-    <h1>feed.html</h1>
+    <h1>Feed</h1>
+    <header>
+        {{if .current_user}}
+        <a href="/me">{{.current_user}}</a>
+        <a href="/logout">LOGOUT</a>
+        {{else}}
+        <a href="/login">LOGIN</a>
+        <a href="/signup">SIGNUP</a>
+        {{end}}
+    </header>
     <div>
         <p>ТОП 1488 слов для ghjuhfvvbcnjd</p>
-        <a href="/list/q/1">START</a>
+        <a href="/q">START</a>
     </div>
 </body>

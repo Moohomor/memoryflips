@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+
 	// "github.com/go-chi/chi"
 	// "context"
 	"html/template"
@@ -9,7 +10,20 @@ import (
 
 func Index(w http.ResponseWriter, r *http.Request) {
 	tpl := template.Must(template.ParseFiles("home.html"))
-	err := tpl.Execute(w, nil)
+	user, err := GetCurrentUser(w, r)
+	var parameters map[string]string
+	if user != nil {
+		parameters = map[string]string{
+			"current_user": user.Name,
+		}
+	} else if err != nil {
+		parameters = map[string]string{
+			"current_user": "",
+		}
+	} else {
+		return
+	}
+	err = tpl.Execute(w, parameters)
 	if err != nil {
 		return
 	}
@@ -19,9 +33,64 @@ func Favicon(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "files/favicon.ico", http.StatusFound)
 }
 
-func List(w http.ResponseWriter, r *http.Request) {
+func Feed(w http.ResponseWriter, r *http.Request) {
+	user, err := GetCurrentUser(w, r)
+	var parameters map[string]string
+	if user != nil {
+		parameters = map[string]string{
+			"current_user": user.Name,
+		}
+	} else if err != nil {
+		parameters = map[string]string{
+			"current_user": "",
+		}
+	} else {
+		return
+	}
 	tpl := template.Must(template.ParseFiles("feed.html"))
-	err := tpl.Execute(w, nil)
+	err = tpl.Execute(w, parameters)
+	if err != nil {
+		return
+	}
+}
+
+func Question(w http.ResponseWriter, r *http.Request) {
+	user, err := GetCurrentUser(w, r)
+	var parameters map[string]string
+	if user != nil {
+		parameters = map[string]string{
+			"current_user": user.Name,
+		}
+	} else if err != nil {
+		parameters = map[string]string{
+			"current_user": "",
+		}
+	} else {
+		return
+	}
+	tpl := template.Must(template.ParseFiles("question.html"))
+	err = tpl.Execute(w, parameters)
+	if err != nil {
+		return
+	}
+}
+
+func Answer(w http.ResponseWriter, r *http.Request) {
+	user, err := GetCurrentUser(w, r)
+	var parameters map[string]string
+	if user != nil {
+		parameters = map[string]string{
+			"current_user": user.Name,
+		}
+	} else if err != nil {
+		parameters = map[string]string{
+			"current_user": "",
+		}
+	} else {
+		return
+	}
+	tpl := template.Must(template.ParseFiles("answer.html"))
+	err = tpl.Execute(w, parameters)
 	if err != nil {
 		return
 	}
