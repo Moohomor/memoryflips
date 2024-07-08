@@ -25,11 +25,6 @@ func main() {
 	}
 	defer db.Close()
 
-	// Создание репозитория, сервиса и обработчиков
-	// repo := repositories.NewUserRepository(db)
-	// service := services.NewDefaultUserService(repo)
-	// handler := handlers.NewUserHandler(service)
-
 	// Настройка маршрутизатора
 	r := chi.NewRouter()
 
@@ -38,20 +33,27 @@ func main() {
 	FileServer(r, "/files", filesDir)
 
 	authHandlers := handlers.NewAuthHandler(dbsvc.NewService(db))
+	listHandlers := handlers.NewWordsHandler(dbsvc.NewService(db))
 
 	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(404)
-		w.Write([]byte("route does not exist"))
+		_, err = w.Write([]byte("route does not exist"))
+		if err != nil {
+			return
+		}
 	})
 	r.MethodNotAllowed(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(405)
-		w.Write([]byte("method is not valid"))
+		_, err = w.Write([]byte("method is not valid"))
+		if err != nil {
+			return
+		}
 	})
 
 	r.Get("/", handlers.Index)
 	r.Get("/feed", handlers.Feed)
-	r.Get("/q", handlers.Question)
-	r.Get("/a-{aid}", handlers.Answer)
+	r.Get("/q", listHandlers.Question)
+	r.Get("/a-{aid}", listHandlers.Answer)
 	r.Get("/favicon.ico", handlers.Favicon)
 	r.Get("/me", handlers.MyProfile)
 

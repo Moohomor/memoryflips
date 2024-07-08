@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"html/template"
 	"memoryflips/db"
@@ -176,15 +177,23 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 func MyProfile(w http.ResponseWriter, r *http.Request) {
 	// If the session is valid, return the welcome message to the user
 	user, err := GetCurrentUser(w, r)
-	if err == http.ErrNoCookie {
+	if errors.Is(err, http.ErrNoCookie) {
 		w.WriteHeader(http.StatusUnauthorized)
-		w.Write([]byte("<h1>401 Unauthorized</h1>\nThere's no cookie"))
+		if err != nil {
+			return
+		}
 	} else if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("<h1>400 Bad Request</h1>\nThat's all we know"))
+		_, err = w.Write([]byte("<h1>400 Bad Request</h1>\nThat's all we know"))
+		if err != nil {
+			return
+		}
 		return
 	}
-	w.Write([]byte("Welcome " + user.Name))
+	_, err = w.Write([]byte("Welcome " + user.Name))
+	if err != nil {
+		return
+	}
 }
 
 func GetCurrentUser(w http.ResponseWriter, r *http.Request) (*db.User, error) {
