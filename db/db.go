@@ -37,6 +37,16 @@ func (s *Service) GetWord(ctx context.Context) (*Word, error) {
 	return word, nil
 }
 
+func (s *Service) GetWordById(ctx context.Context, id int) (*Word, error) {
+	word := &Word{}
+	err := s.db.QueryRow(ctx, "SELECT id, eng, rus FROM schema.words WHERE id = $1;", id).
+		Scan(&word.Id, &word.Eng, &word.Rus)
+	if err != nil {
+		return nil, err
+	}
+	return word, nil
+}
+
 func (s *Service) GetUserByName(ctx context.Context, name string) (*User, error) {
 	user := &User{}
 	err := s.db.QueryRow(ctx, "SELECT id, username, password FROM schema.users WHERE username = $1;", name).

@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"net/http"
 
 	// "github.com/go-chi/chi"
@@ -11,16 +12,12 @@ import (
 func Index(w http.ResponseWriter, r *http.Request) {
 	tpl := template.Must(template.ParseFiles("home.html"))
 	user, err := GetCurrentUser(w, r)
-	var parameters map[string]string
+	parameters := map[string]string{}
 	if user != nil {
-		parameters = map[string]string{
-			"current_user": user.Name,
-		}
+		parameters["current_user"] = user.Name
+	} else if errors.Is(err, http.ErrNoCookie) {
+		parameters["current_user"] = ""
 	} else if err != nil {
-		parameters = map[string]string{
-			"current_user": "",
-		}
-	} else {
 		return
 	}
 	err = tpl.Execute(w, parameters)
@@ -40,13 +37,12 @@ func Feed(w http.ResponseWriter, r *http.Request) {
 		parameters = map[string]string{
 			"current_user": user.Name,
 		}
-	} else if err != nil {
+	} else if errors.Is(err, http.ErrNoCookie) {
 		parameters = map[string]string{
 			"current_user": "",
 		}
-	} else {
-		return
 	}
+
 	tpl := template.Must(template.ParseFiles("feed.html"))
 	err = tpl.Execute(w, parameters)
 	if err != nil {

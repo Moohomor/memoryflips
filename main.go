@@ -51,17 +51,20 @@ func main() {
 	})
 
 	r.Get("/", handlers.Index)
-	r.Get("/feed", handlers.Feed)
-	r.Get("/q", listHandlers.Question)
-	r.Get("/a-{aid}", listHandlers.Answer)
 	r.Get("/favicon.ico", handlers.Favicon)
-	r.Get("/me", handlers.MyProfile)
+	r.Get("/feed", handlers.Feed)
+
+	r.Get("/q", listHandlers.Question)
+	r.Get("/a-{wid}", listHandlers.Answer)
+	r.Get("/l-{wid}", listHandlers.Learned)
+	r.Get("/result", listHandlers.Result)
 
 	r.Get("/login", handlers.Login)
 	r.Post("/login", authHandlers.LoginPost)
 	r.Get("/signup", handlers.Signup)
 	r.Post("/signup", authHandlers.SignupPost)
 	r.Get("/logout", handlers.Logout)
+	r.Get("/me", handlers.MyProfile)
 
 	// Запуск HTTP сервера
 	log.Println("Starting server on :8080")

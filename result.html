@@ -1,0 +1,20 @@
+<head>
+    <title>Result</title>
+</head>
+<body>
+    <h1>Result</h1>
+    <header>
+        {{if .current_user}}
+        <a href="/me">{{.current_user}}</a>
+        <a href="/logout">LOGOUT</a>
+        {{else}}
+        <a href="/login">LOGIN</a>
+        <a href="/signup">SIGNUP</a>
+        {{end}}
+    </header>
+    <h2>
+        {{.percentage}}%
+        <br>
+        {{.correct}}/{{.total}}
+    </h2>
+</body>

@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"html/template"
 	"memoryflips/db"
@@ -50,7 +49,7 @@ func (h *AuthHandler) LoginPost(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(username, password)
 	user, err := h.svc.GetUserByName(context.Background(), username)
 	if err != nil {
-		panic(err)
+		w.Write([]byte("User not found"))
 		return
 	}
 	var creds = Credentials{
@@ -64,6 +63,7 @@ func (h *AuthHandler) LoginPost(w http.ResponseWriter, r *http.Request) {
 
 	if expectedPassword != creds.Password {
 		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte("Wrong password"))
 		return
 	}
 
@@ -177,17 +177,12 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 func MyProfile(w http.ResponseWriter, r *http.Request) {
 	// If the session is valid, return the welcome message to the user
 	user, err := GetCurrentUser(w, r)
-	if errors.Is(err, http.ErrNoCookie) {
-		w.WriteHeader(http.StatusUnauthorized)
-		if err != nil {
-			return
-		}
-	} else if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		_, err = w.Write([]byte("<h1>400 Bad Request</h1>\nThat's all we know"))
-		if err != nil {
-			return
-		}
+	parameters := map[string]string{}
+	if user != nil {
+		parameters["current_user"] = user.Name
+	} else if err == nil {
+		parameters["current_user"] = ""
+	} else {
 		return
 	}
 	_, err = w.Write([]byte("Welcome " + user.Name))
