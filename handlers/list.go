@@ -57,7 +57,7 @@ func (h *WordsHandler) Question(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	word, err := h.svc.GetWord(context.Background())
+	word, err := h.svc.GetWord(context.Background(), *user)
 	if err != nil {
 		panic(err)
 		return
@@ -237,8 +237,27 @@ func (h *WordsHandler) Learned(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	user, err := GetCurrentUser(w, r)
+	if err != nil {
+		panic(err)
+		return
+	}
+	if user == nil {
+		http.Redirect(w, r, "/q", http.StatusFound)
+		return
+	}
+
 	// mark word as learned
-	wid := chi.URLParam(r, "wid")
-	fmt.Println(wid)
+	wid, err := strconv.Atoi(chi.URLParam(r, "wid"))
+	if err != nil {
+		panic(err)
+		return
+	}
+	word, err := h.svc.GetWordById(context.Background(), wid)
+	if err != nil {
+		panic(err)
+		return
+	}
+	h.svc.MarkWordAsLearned(context.Background(), *user, *word)
 	http.Redirect(w, r, "/q", http.StatusFound)
 }

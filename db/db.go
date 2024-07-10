@@ -27,9 +27,19 @@ func NewService(db *pgxpool.Pool) *Service {
 	return &Service{db: db}
 }
 
-func (s *Service) GetWord(ctx context.Context) (*Word, error) {
+func (s *Service) GetWord(ctx context.Context, user User) (*Word, error) {
 	word := &Word{}
-	err := s.db.QueryRow(ctx, "SELECT id, eng, rus FROM schema.words ORDER BY random() LIMIT 1;").
+
+	// check if all word are learned
+	rows, err := s.db.Query(ctx, "SELECT * FROM schema.words WHERE eng NOT IN (SELECT word FROM schema.learned WHERE user_id = $1) LIMIT 1;", user.Id)
+	if err != nil {
+		return nil, err
+	}
+	if !rows.Next() {
+		return nil, nil
+	}
+
+	err = s.db.QueryRow(ctx, "SELECT id, eng, rus FROM schema.words WHERE eng NOT IN (SELECT word FROM schema.learned WHERE user_id = $1) ORDER BY random() LIMIT 1;", user.Id).
 		Scan(&word.Id, &word.Eng, &word.Rus)
 	if err != nil {
 		return nil, err
@@ -58,9 +68,18 @@ func (s *Service) GetUserByName(ctx context.Context, name string) (*User, error)
 }
 
 func (s *Service) CreateUser(ctx context.Context, user User) error {
-	err := s.db.QueryRow(ctx, "insert into schema.users (username, password) values ($1,$2) returning id", user.Name, user.Password).
+	err := s.db.QueryRow(ctx, "INSERT INTO schema.users (username, password) VALUES ($1,$2) RETURNING id", user.Name, user.Password).
 		Scan(&user.Id)
 	fmt.Println(user)
+	if err != nil {
+		panic(err)
+		return err
+	}
+	return nil
+}
+
+func (s *Service) MarkWordAsLearned(ctx context.Context, user User, word Word) error {
+	_, err := s.db.Exec(ctx, "INSERT INTO schema.learned(word, user_id) VALUES ($1, $2);", word.Eng, user.Id)
 	if err != nil {
 		panic(err)
 		return err
