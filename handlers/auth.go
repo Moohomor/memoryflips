@@ -99,7 +99,7 @@ func (h *AuthHandler) SignupPost(w http.ResponseWriter, r *http.Request) {
 	username := r.Form.Get("username")
 	password := r.Form.Get("password")
 	fmt.Println(username, password)
-	var user = db.User{
+	var user = &db.User{
 		Name:     username,
 		Password: password,
 	}
@@ -116,7 +116,7 @@ func (h *AuthHandler) SignupPost(w http.ResponseWriter, r *http.Request) {
 
 	// Set the token in the session map, along with the session information
 	sessions[sessionToken] = session{
-		user:   user,
+		user:   *user,
 		expiry: expiresAt,
 	}
 

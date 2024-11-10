@@ -55,7 +55,7 @@ func main() {
 	r.Get("/feed", handlers.Feed)
 
 	r.Get("/q", listHandlers.Question)
-	r.Get("/a-{wid}", listHandlers.Answer)
+	//r.Get("/a-{wid}", listHandlers.Answer)
 	r.Get("/l-{wid}", listHandlers.Learned)
 	r.Get("/result", listHandlers.Result)
 
@@ -68,7 +68,7 @@ func main() {
 
 	// Запуск HTTP сервера
 	log.Println("Starting server on :8080")
-	log.Fatal(http.ListenAndServe(":8080", r))
+	log.Fatal(http.ListenAndServe("192.168.1.128:8080", r))
 }
 
 func FileServer(r chi.Router, path string, root http.FileSystem) {

@@ -1,20 +1,207 @@
+<!DOCTYPE html>
+<html>
 <head>
-    <title>Result</title>
-</head>
-<body>
-    <h1>Result</h1>
+    <title>Результаты</title>
     <header>
-        {{if .current_user}}
-        <a href="/me">{{.current_user}}</a>
-        <a href="/logout">LOGOUT</a>
-        {{else}}
-        <a href="/login">LOGIN</a>
-        <a href="/signup">SIGNUP</a>
-        {{end}}
+        <div class="cap">
+            <div style="border-radius: 50%; padding: 6px; border: 1px solid black">
+                <img class="roundlogo" src="files/logo.jpg" alt="" />
+            </div>
+            <a href="/">MemoryFlip </a>
+            <a href="/">|</a>
+            <a href="/">на главную</a>
+            {{if .current_user}}
+            <a href="/me">{{.current_user}}</a>
+            <a href="/logout">Выйти</a>
+            {{else}}
+            <a href="/login">Войти</a>
+            <a href="/signup">Зарегистрироваться</a>
+            {{end}}
+        </div>
+        <hr />
     </header>
-    <h2>
+    <style>
+        @property --p {
+            syntax: "<number>";
+            inherits: true;
+            initial-value: 0;
+        }
+
+        .pie {
+            --p: 20;
+            --b: 22px;
+            --c: #44378b;
+            --w: 150px;
+
+            width: var(--w);
+            aspect-ratio: 1;
+            position: relative;
+            display: inline-grid;
+            place-content: center;
+            font-size: 32px;
+            font-weight: bold;
+            font-family: sans-serif;
+        }
+
+        .pie:before,
+        .pie:after {
+            content: "";
+            position: absolute;
+            border-radius: 50%;
+        }
+
+        .pie:before {
+            inset: 0;
+            background: radial-gradient(farthest-side, var(--c) 98%, #0000)
+            top/var(--b) var(--b) no-repeat,
+            conic-gradient(var(--c) calc(var(--p) * 1%), #0000 0);
+            -webkit-mask: radial-gradient(
+                    farthest-side,
+                    #0000 calc(99% - var(--b)),
+                    #000 calc(100% - var(--b))
+            );
+            mask: radial-gradient(
+                    farthest-side,
+                    #0000 calc(99% - var(--b)),
+                    #000 calc(100% - var(--b))
+            );
+        }
+
+        .pie:after {
+            inset: calc(50% - var(--b) / 2);
+            background: var(--c);
+            transform: rotate(calc(var(--p) * 3.6deg))
+            translateY(calc(50% - var(--w) / 2));
+        }
+
+        .animate {
+            animation: p 1s 0.5s both;
+        }
+
+        .no-round:before {
+            background-size: 0 0, auto;
+        }
+
+        .no-round:after {
+            content: none;
+        }
+
+        @keyframes p {
+            from {
+                --p: 0;
+            }
+        }
+
+        body {
+            background-color: #b8e3ff;
+        }
+        .purple {
+            background-color: #894ec499;
+            width: 307px;
+            height: 500px;
+            margin: auto;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-evenly;
+            border-radius: 20px;
+        }
+        p {
+            font-size: 32px;
+        }
+        * {
+            padding: 0;
+            margin: 0;
+        }
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        header {
+            text-align: center;
+            background-color: #fff;
+        }
+        ul {
+            list-style: none;
+            margin: 0;
+            padding: 20px;
+        }
+        a {
+            font-size: 16 px;
+            padding-left: px;
+            margin-left: 15px;
+            color: #8556b4;
+            text-decoration: none;
+            font-weight: bolder;
+        }
+        a:hover {
+            color: black;
+        }
+        li {
+            display: inline;
+        }
+        .roundlogo {
+            width: 30px;
+            height: 30px;
+        }
+        hr {
+            border: 0.5;
+            margin-bottom: 20px;
+        }
+        .cap {
+            padding: 10px;
+            margin-right: 500px;
+            display: flex;
+            align-items: center;
+        }
+        h1 {
+            font-size: 12px;
+            font-weight: 800;
+            margin-right: 300px;
+            margin-top: 10px;
+            margin-bottom: 40px;
+        }
+        button {
+            border-radius: 20px;
+            background-color: #eee0ff;
+            margin: 0 auto 120px auto;
+            border: 0;
+            padding: 5px;
+            width: 100px;
+            height: 40px;
+        }
+        .button_text:hover {
+            transition: 0.4s;
+            background: #ebcbfd;
+            color: rgb(0, 0, 0);
+        }
+    </style>
+</head>
+
+<body>
+<div class="purple">
+    <p>Вы набрали {{.correct}}/{{.total}}</p>
+    <div
+            id="progress-bar"
+            class="pie animate no-round"
+            style="--p: 5; --c: rgb(159, 114, 218)"
+    >
         {{.percentage}}%
-        <br>
-        {{.correct}}/{{.total}}
-    </h2>
+    </div>
+    <button
+            class="button_text"
+            onclick="window.location.href = '/';"
+    >
+        завершить
+    </button>
+</div>
+
+<script>
+    function setProgress(progress) {
+        const progressBar = document.getElementById("progress-bar");
+        progressBar.style.cssText = `--p:${progress}`;
+    }
+    setProgress({{.percentage}});
+</script>
 </body>
+</html>

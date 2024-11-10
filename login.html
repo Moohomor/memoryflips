@@ -1,8 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <title>Login</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MemoryFlip</title>
+    <style>
+        /*общие стили*/
+        *{
+            padding: 0;
+            margin: 0; }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #C0E4FC;
+        }
+
+        /* стили для шапки*/
+        header{
+            text-align: center;
+
+
+        }
+        ul{
+            list-style: none;
+            margin: 0;
+            padding: 20px;
+        }
+        a{
+            font-size: 16 px;
+            margin-left: 15px;
+            color: #8556B4;
+            text-decoration: none;
+            font-weight: bolder;
+        }
+        a:hover{
+            color: black;
+        }
+        li{
+            display: inline;
+        }
+        .roundlogo{
+            width: 30px;
+            height: 30px;
+        }
+        hr{
+            border: 0.5;
+            margin-bottom: 20px;
+        }
+        .cap{
+            padding: 10px;
+            margin-right: 500px;
+            display: flex;
+            align-items: center;
+        }
+        h1{
+            font-size: 12px;
+            font-weight: 800;
+            margin-right: 300px;
+            margin-top: 10px;
+            margin-bottom: 40px;
+
+
+        }
+        /*стили для блока регистрации*/
+
+        .purple{
+            background-color: #44378B;
+            border-radius: 20px;
+            padding: 24px;
+            width: 1020px;
+            margin: auto;
+            text-align: center;
+            margin-bottom: 600px;
+        }
+        p{
+            color:#EEE0FF ;
+        }
+        .auth_text {
+            color: white;
+            font-size: 40px;
+            text-align: center;
+
+            -webkit-text-stroke: 1px black;
+            color: rgba(0,0,0,0);
+            /*   background: -webkit-linear-gradient(green, blue);
+              -webkit-background-clip: text;
+              -webkit-text-fill-color: transparent; */
+
+            font-family: sans-serif;
+            font-weight: 900;
+        }
+
+
+        .login_text {
+            transition: 0.5s;
+            display: block;
+            margin: auto;
+            margin-bottom: 10px;
+            font-size: 20px;
+            padding: 10px;
+            padding-left: 20px;
+            border-radius: 25px;
+            border: 2px solid black;
+            width: 200px;
+        }
+
+        .login_text:focus {
+            transition: 0.3s;
+            border-radius: 40px;
+            width: 400px;
+            background: #EEE0FF;
+        }
+
+        .password_text {
+            transition: 0.5s;
+            display: block;
+            margin: auto;
+            margin-bottom: 10px;
+            font-size: 20px;
+            padding: 10px;
+            padding-left: 20px;
+            border-radius: 25px;
+            border: 2px solid black;
+            width: 200px;
+        }
+
+        .password_text:focus {
+            transition: 0.5s;
+            border-radius: 40px;
+            width: 400px;
+            background: #EEE0FF;
+        }
+
+        .button_text {
+            transition: 0.4s;
+            display: block;
+            margin: auto;
+            font-size: 20px;
+            width: 150px;
+            height: 40px;
+            font-weight: 700;
+            border-radius: 25px;
+            border: 2px solid black;
+            background: white;
+            color: gray;
+        }
+
+        .button_text:hover {
+            transition: 0.4s;
+            background: #EEE0FF;
+            color: rgb(0, 0, 0);
+            width: 235px;
+        }
+
+        .button_text:active {
+            background: #44378B;
+            border: 0px;
+        }
+
+        .checkbox_text {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+
+        .stack {
+            text-align: center;
+            margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: 1fr;
+        }
+
+        .stack span {
+            color: rgba(0,0,0,0);
+            font-family: sans-serif;
+            -webkit-text-stroke: 0.5px #EEE0FF;;
+            font-weight: bold;
+            grid-row-start: 1;
+            grid-column-start: 1;
+            font-size: 2.5rem;
+            --stack-height: calc(100% / var(--stacks) - 1px);
+            --inverse-index: calc(calc(var(--stacks) - 1) - var(--index));
+            --clip-top: calc(var(--stack-height) * var(--index));
+            --clip-bottom: calc(var(--stack-height) * var(--inverse-index));
+            clip-path: inset(var(--clip-top) 0 var(--clip-bottom) 0);
+            animation: stack 340ms cubic-bezier(.46,.29,0,1.24) 1 backwards calc(var(--index) * 120ms), glitch 2s ease infinite 2s alternate-reverse;
+        }
+
+        .stack span:nth-child(odd) { --glitch-translate: 8px; }
+        .stack span:nth-child(even) { --glitch-translate: -8px; }
+
+        @keyframes stack {
+            0% {
+                opacity: 0;
+                transform: translateX(-50%);
+                text-shadow: -2px 3px 0 #EEE0FF, 2px -3px 0 #44378B;
+            };
+        60% {
+            opacity: 0.5;
+            transform: translateX(50%);
+        }
+        80% {
+            transform: none;
+            opacity: 1;
+            text-shadow: 2px -3px 0 #EEE0FF, -2px 3px 0 #51CDF3;
+        }
+        100% {
+            text-shadow: none;
+        }
+        }
+
+        @keyframes glitch {
+            0% {
+                text-shadow: -2px 3px 0  #EEE0FF , 2px -3px 0 #51CDF3;
+                transform: translate(var(--glitch-translate));
+            }
+            2% {
+                text-shadow: 2px -3px 0  #EEE0FF, -2px 3px 0 #51CDF3;
+            }
+            4%, 100% {  text-shadow: none; transform: none; }
+        }
+        span{
+            color: #EEE0FF;
+        }
+
+
+    </style>
+
+
 </head>
 <body>
-    <h1>Login</h1>
+<script>
+
+</script>
+<header>
+    <div style="background-color: white;">
+        <div class="cap">
+            <div style="border-radius: 50%; padding: 6px; border: 1px solid black;">
+                <img class= "roundlogo" src="files/logo.jpg" alt="">
+            </div>
+            <a href="/" >MemoryFlip </a>
+            <a href="/" >|</a>
+            <a href="/" >на главную</a>
+        </div>
+    </div>
+    <hr>
+</header>
+
+
+
+<div class="purple">
+    <div class="stack" style="--stacks: 3;">
+        <span style="--index: 0;">Авторизация</span>
+        <span style="--index: 1;">Авторизация</span>
+        <span style="--index: 2;">Авторизация</span>
+
+    </div>
     <form method="POST" action="/login">
         <div class="form-group my-2">
             <input class="form-control" type="username" name="username" placeholder="Имя пользователя" autofocus="">
@@ -13,4 +266,7 @@
         <button type="submit" class="btn btn-primary">Войти</button>
         <div>{{ .message }}</div>
     </form>
+</div>
+</div>
 </body>
+</html>

@@ -1,10 +1,74 @@
+<!--<head>-->
+<!--    <title>Question</title>-->
+<!--</head>-->
+<!--<body>-->
+<!--    <h1>Question</h1>-->
+<!--    <h2>{{.word}}</h2>-->
+<!--    <form action="/a-{{.word_id}}">-->
+<!--        <button type="submit" class="btn btn-primary">Check</button>-->
+<!--    </form>-->
+<!--</body>-->
+<!DOCTYPE html>
+<html lang="en">
+
 <head>
-    <title>Question</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MemoryFlip</title>
+    <link rel="stylesheet" href="files/kat.css" />
 </head>
+
 <body>
-    <h1>Question</h1>
-    <h2>{{.word}}</h2>
-    <form action="/a-{{.word_id}}">
-        <button type="submit" class="btn btn-primary">Check</button>
-    </form>
+<script>
+
+</script>
+<header>
+    <div class="cap">
+        <div style="border-radius: 50%; padding: 6px; border: 1px solid black;">
+            <img class="roundlogo" src="files/logo.jpg" alt="">
+        </div>
+        <a href="/">MemoryFlip </a>
+        <a href="/">|</a>
+
+        <a href="/">на главную</a>
+
+    </div>
+    <hr>
+</header>
+</div>
+
+
+<div class="flip-container" onclick="this.classList.toggle('click');">
+    <div class="flipper">
+        <div class="front center_items">
+            <!-- front content -->
+            <h3>{{.rus}}</h3>
+            <div>
+                <button class="main_button">проверить</button>
+            </div>
+
+        </div>
+        <div class="back center_items">
+            <form action="/q">
+            <button class="arrow arrow-left">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left-circle" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-4.5-.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5z"/>
+                </svg>
+                <p> неверно</p>
+            </button>
+            </form>
+            <h3>{{.eng}}</h3>
+
+            <form action="/l-{{.word_id}}">
+            <button class="arrow arrow-right">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right-circle" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z"/>
+                </svg>
+                <p> верно</p>
+            </button>
+            <!-- back content -->
+        </div>
+    </div>
+</div>
 </body>
+</html>

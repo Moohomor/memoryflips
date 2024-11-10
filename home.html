@@ -1,16 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <title>MemoryFlips</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MemoryFlip</title>
+    <link rel="stylesheet" href="files/style1.css" />
 </head>
 <body>
-    <h1>Home page</h1>
-    <header>
+<header>
+    <div class="cap">
+        <div style="border-radius: 50%; padding: 6px; border: 1px solid black">
+            <img class="roundlogo" src="files/logo.jpg" alt="" />
+        </div>
+        <a href="">MemoryFlip </a>
+        <a href="">|</a>
+        <a
+                href="#about"
+                onclick="console.log(document.getElementById('about'));document.getElementById('about').scrollIntoView()"
+        >о нас</a
+        >
+        <a href="">|</a>
+        <a
+                href="#memo"
+                onclick="console.log(document.getElementById('memo'));document.getElementById('memo').scrollIntoView()"
+        >памятка</a
+        >
+        <a href="">|</a>
         {{if .current_user}}
         <a href="/me">{{.current_user}}</a>
-        <a href="/logout">LOGOUT</a>
+        <a href="/logout">Выйти</a>
         {{else}}
-        <a href="/login">LOGIN</a>
-        <a href="/signup">SIGNUP</a>
+        <a href="/login">Войти</a>
+        <a href="/signup">Зарегистрироваться</a>
         {{end}}
-    </header>
-    <a href="/feed">START</a>
+    </div>
+</header>
+<div
+        style="height: 748px; background: url('files/fon6.jpg'); background-size: cover"
+></div>
+<div
+        style="
+        padding: 200px 0;
+        background: url('files/fon31.png');
+        background-size: cover;
+      "
+>
+    <div
+            style="
+          background: url('files/termin.jpg');
+          background-size: contain;
+          background-repeat: no-repeat;
+          background-position: center;
+          height: 513px;
+          margin: auto;
+          display: flex;
+          flex-direction: column;
+          justify-content: end;
+        "
+    >
+        <button class="button_text"
+                onclick="window.location.href = '/feed';"
+        ><a>Начать</a></button>
+    </div>
+</div>
+<div class="video-container">
+    <video autoplay muted loop class="bg-video">
+        <source src="/files/video.mp4" type="video/mp4" />
+    </video>
+    <div class="purple">
+        <div id="about">
+            <h2>О нас</h2>
+            <p>
+                MemoryFlip - это компания, специализирующаяся на разработке сайта
+                для запоминания слов через метод флеш-карточек. Наш проект поможет
+                эффективно изучать новые слова, используя интерактивный и
+                увлекательный подход. Учиться легко и увлекательно с MemoryFlip!
+            </p>
+        </div>
+    </div>
+    <div class="purple">
+        <div id="memo">
+            <h2>Памятка</h2>
+            <p>
+                краткая памятка для новых участников сайта MemoryFlip:<br />1.
+                Регистрация — Создайте аккаунт, чтобы получить доступ ко всем
+                функциям сайта.<br />2. Начните изучение — Нажмите на кнопку
+                Начать и начните игру.<br />3. Запоминание — Используйте принцип
+                Флеш-карточек для запоминания новой лексики: попробуйте угадать
+                перевод слова на карточке.<br />4. Повторение — Регулярно
+                повторяйте изученные слова, чтобы закрепить их в памяти.<br />5.Отслеживание
+                прогресса — Следите за своим прогрессом в запоминании слов и
+                стремитесь к улучшению..<br />Удачи в изучении новых слов с
+                помощью MemoryFlip!
+            </p>
+        </div>
+    </div>
+</div>
+</div>
+<footer>
+
+    <!-- <img src="" alt="" /> -->
+    <a href="#">Memory Flip</a>
+
+</footer>
 </body>
+</html>

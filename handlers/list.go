@@ -57,7 +57,7 @@ func (h *WordsHandler) Question(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	word, err := h.svc.GetWord(context.Background(), *user)
+	word, err := h.svc.GetWord(context.Background(), user)
 	if err != nil {
 		panic(err)
 		return
@@ -65,7 +65,8 @@ func (h *WordsHandler) Question(w http.ResponseWriter, r *http.Request) {
 	if word != nil {
 		parameters = map[string]string{
 			"word_id": strconv.Itoa(word.Id),
-			"word":    word.Rus,
+			"rus":     word.Rus,
+			"eng":     word.Eng,
 		}
 	}
 	if err != nil {
@@ -79,42 +80,42 @@ func (h *WordsHandler) Question(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *WordsHandler) Answer(w http.ResponseWriter, r *http.Request) {
-	user, err := GetCurrentUser(w, r)
-	var parameters map[string]string
-	if user != nil {
-		parameters = map[string]string{
-			"current_user": user.Name,
-		}
-	} else if errors.Is(err, http.ErrNoCookie) {
-		parameters = map[string]string{
-			"current_user": "",
-		}
-	} else if err != nil {
-		panic(err)
-		return
-	}
-
-	idParam, err := strconv.Atoi(chi.URLParam(r, "wid"))
-	if err != nil {
-		panic(err)
-		return
-	}
-	word, err := h.svc.GetWordById(context.Background(), idParam)
-	if err != nil {
-		panic(err)
-		return
-	}
-	if word != nil {
-		parameters["word_id"] = strconv.Itoa(word.Id)
-		parameters["word"] = word.Eng
-	}
-	tpl := template.Must(template.ParseFiles("answer.html"))
-	err = tpl.Execute(w, parameters)
-	if err != nil {
-		return
-	}
-}
+//func (h *WordsHandler) Answer(w http.ResponseWriter, r *http.Request) {
+//	user, err := GetCurrentUser(w, r)
+//	var parameters map[string]string
+//	if user != nil {
+//		parameters = map[string]string{
+//			"current_user": user.Name,
+//		}
+//	} else if errors.Is(err, http.ErrNoCookie) {
+//		parameters = map[string]string{
+//			"current_user": "",
+//		}
+//	} else if err != nil {
+//		panic(err)
+//		return
+//	}
+//
+//	idParam, err := strconv.Atoi(chi.URLParam(r, "wid"))
+//	if err != nil {
+//		panic(err)
+//		return
+//	}
+//	word, err := h.svc.GetWordById(context.Background(), idParam)
+//	if err != nil {
+//		panic(err)
+//		return
+//	}
+//	if word != nil {
+//		parameters["word_id"] = strconv.Itoa(word.Id)
+//		parameters["word"] = word.Eng
+//	}
+//	tpl := template.Must(template.ParseFiles("answer.html"))
+//	err = tpl.Execute(w, parameters)
+//	if err != nil {
+//		return
+//	}
+//}
 
 func (h *WordsHandler) Result(w http.ResponseWriter, r *http.Request) {
 	user, err := GetCurrentUser(w, r)
@@ -238,12 +239,12 @@ func (h *WordsHandler) Learned(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user, err := GetCurrentUser(w, r)
-	if err != nil {
-		panic(err)
-		return
-	}
 	if user == nil {
 		http.Redirect(w, r, "/q", http.StatusFound)
+		return
+	}
+	if err != nil {
+		panic(err)
 		return
 	}
 
@@ -258,6 +259,10 @@ func (h *WordsHandler) Learned(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 		return
 	}
-	h.svc.MarkWordAsLearned(context.Background(), *user, *word)
+	err = h.svc.MarkWordAsLearned(context.Background(), user, word)
+	if err != nil {
+		panic(err)
+		return
+	}
 	http.Redirect(w, r, "/q", http.StatusFound)
 }
